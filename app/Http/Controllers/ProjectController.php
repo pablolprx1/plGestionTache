@@ -19,9 +19,15 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         $status = $request->input('status');
+        $user = Auth::user();
 
-        $projects = Project::query();
+        // Filtrer les projets où l'utilisateur est créateur ou collaborateur
+        $projects = Project::where('user_id', $user->id)
+            ->orWhereHas('users', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            });
 
+        // Appliquer les filtres de statut
         if ($status === 'completed') {
             $projects->completed();
         } elseif ($status === 'incomplete') {
@@ -32,7 +38,6 @@ class ProjectController extends Controller
 
         return view('projects.index', compact('projects', 'status'));
     }
-
 
     public function create()
     {
@@ -56,12 +61,6 @@ class ProjectController extends Controller
             $errorMessage = "Erreur lors de la création du projet avec l'utilisateur ID : " . Auth::id() . ". Détails : " . $e->getMessage();
             return back()->withErrors(['message' => $errorMessage]);
         }
-    }
-
-    public function show(Project $project)
-    {
-        $phases = $project->phases()->with('tasks')->orderBy('order')->get(); // Trier les phases par ordre
-        return view('projects.show', compact('project', 'phases'));
     }
 
     public function edit(Project $project)
@@ -96,4 +95,24 @@ class ProjectController extends Controller
         return redirect()->route('projects.index')->with('success', 'Projet supprimé avec succès.');
     }
 
+    public function show(Project $project)
+    {
+        $this->authorizeProjectAccess($project);
+
+        // Charger les tâches associées au projet
+        $tasks = $project->tasks()->orderBy('deadline')->get();
+
+        // Retourner la vue avec les données du projet et des tâches
+        return view('projects.show', compact('project', 'tasks'));
+    }
+
+    protected function authorizeProjectAccess(Project $project)
+    {
+        $user = Auth::user();
+
+        // Vérifie si l'utilisateur est le créateur ou un collaborateur du projet
+        if ($project->user_id !== $user->id && !$project->users->contains($user)) {
+            abort(403, 'Vous n\'êtes pas autorisé à accéder à ce projet.');
+        }
+    }
 }

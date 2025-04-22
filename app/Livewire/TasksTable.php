@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-use App\Models\Phase;
 use App\Models\Task;
 use Livewire\Component;
 use Livewire\Attributes\On;
@@ -13,20 +12,18 @@ class TasksTable extends Component
     public $editingTaskId = null;
     public $editingTaskTitle;
     public $editingTaskDescription;
-    public $newTaskName = [];
-    public $newPhaseName;
+    public $newTaskName;
 
     protected $listeners = ['openEditTaskModal', 'updateTaskData', 'refreshTasksTable'];
 
     public function render()
     {
-        $phases = Phase::with('tasks')->where('project_id', $this->projectId)->get();
+        $tasks = Task::where('project_id', $this->projectId)->orderBy('deadline')->get();
 
         return view('livewire.tasks-table', [
-            'phases' => $phases,
+            'tasks' => $tasks,
         ]);
     }
-
 
     public function toggleTaskState($taskId)
     {
@@ -39,7 +36,6 @@ class TasksTable extends Component
     {
         Task::find($taskId)->delete();
     }
-
 
     public function openEditTaskModal($taskId)
     {
@@ -57,7 +53,6 @@ class TasksTable extends Component
         }
     }
 
-
     public function updateTaskData($title, $description, $deadline)
     {
         $task = Task::find($this->editingTaskId);
@@ -74,61 +69,21 @@ class TasksTable extends Component
         }
     }
 
-    public function addTask($phaseId)
+    public function addTask()
     {
-        $validatedData = $this->validate([
-            'newTaskName.' . $phaseId => 'required|max:255',
+        $this->validate([
+            'newTaskName' => 'required|max:255',
         ]);
 
         Task::create([
-            'phase_id' => $phaseId,
-            'title' => $this->newTaskName[$phaseId],
+            'project_id' => $this->projectId,
+            'title' => $this->newTaskName,
             'is_completed' => false,
         ]);
 
-        $this->newTaskName[$phaseId] = '';
-    }
-
-    #[On('updateTaskOrder')]
-    public function updateTaskOrder($taskIds)
-    {
-        foreach ($taskIds as $index => $taskId) {
-            $task = Task::find($taskId);
-            $task->order = $index + 1;
-            $task->save();
+        $this->newTaskName = ''; // Réinitialiser le champ après l'ajout
+        $this->dispatch('refreshTasksTable');
         }
-
-        $this->render();
-    }
-
-    public function addPhase()
-    {
-        $this->validate([
-            'newPhaseName' => 'required|max:255',
-        ]);
-
-        Phase::create([
-            'name' => $this->newPhaseName,
-            'project_id' => $this->projectId,
-            'order' => Phase::where('project_id', $this->projectId)->max('order') + 1,
-        ]);
-
-        $this->newPhaseName = ''; // Réinitialiser le champ
-
-        $this->emit('refreshTasksTable');
-    }
-
-    public function deletePhase($phaseId)
-    {
-        $phase = Phase::find($phaseId);
-
-        if ($phase) {
-            $phase->tasks()->delete(); // Supprimer les tâches associées
-            $phase->delete(); // Supprimer la phase
-        }
-
-        $this->emit('refreshTasksTable');
-    }
 
     public function refreshTasksTable()
     {

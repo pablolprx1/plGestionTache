@@ -12,7 +12,7 @@
 
     <!-- Actions -->
 
-    <!-- Phases et tâches -->
+    <!-- Tâches -->
     <div class="relative">
         <livewire:tasks-table :project-id="$project->id" />
     </div>

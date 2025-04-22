@@ -11,12 +11,6 @@ class Project extends Model
     use HasFactory;
     protected $fillable = ['name', 'description', 'is_completed', 'user_id'];
 
-    // Relation avec les phases
-    public function phases()
-    {
-        return $this->hasMany(Phase::class);
-    }
-
     public function scopeCompleted($query)
     {
         return $query->where('is_completed', true);
@@ -41,5 +35,10 @@ class Project extends Model
     public function isCreator($user)
     {
         return $this->user_id === $user->id;
+    }
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
     }
 }

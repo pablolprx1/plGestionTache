@@ -9,7 +9,7 @@ class Task extends Model
     use HasFactory;
 
     protected $fillable = [
-        'phase_id',
+        'project_id',
         'title',
         'description',
         'is_completed',
@@ -21,9 +21,8 @@ class Task extends Model
         'deadline' => 'datetime',
     ];
 
-    // Relation avec la phase
-    public function phase()
+    public function project()
     {
-        return $this->belongsTo(Phase::class);
+        return $this->belongsTo(Project::class);
     }
 }

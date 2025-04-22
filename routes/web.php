@@ -14,6 +14,5 @@ Route::get('/dashboard', function () {
 
 // Charge les fichiers de routes
 require __DIR__.'/projects.php';
-require __DIR__.'/phases.php';
 require __DIR__.'/users.php';
 require __DIR__.'/auth.php';
