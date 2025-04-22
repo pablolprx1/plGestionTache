@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 use Illuminate\Database\QueryException;
 use Illuminate\Routing\Controller;
 
@@ -104,6 +103,29 @@ class ProjectController extends Controller
 
         // Retourner la vue avec les données du projet et des tâches
         return view('projects.show', compact('project', 'tasks'));
+    }
+
+    public function changeStatus(Request $request, Project $project)
+    {
+        $this->authorizeProjectAccess($project);
+
+        // Valider les données du formulaire
+        $validatedData = $request->validate([
+            'name' => 'required|max:255',
+            'description' => 'nullable',
+        ]);
+
+        // Mettre à jour les champs du projet
+        $project->update($validatedData);
+
+        // Changer le statut du projet
+        $project->update([
+            'is_completed' => !$project->is_completed,
+        ]);
+
+        // Rediriger avec un message de succès
+        $statusMessage = $project->is_completed ? 'Le projet a été marqué comme terminé.' : 'Le projet a été marqué comme non terminé.';
+        return redirect()->route('projects.edit', $project)->with('success', $statusMessage . ' Les modifications ont été enregistrées.');
     }
 
     protected function authorizeProjectAccess(Project $project)

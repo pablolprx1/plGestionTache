@@ -5,62 +5,91 @@
         {{ $project ? 'Modifier le projet' : 'Créer un nouveau projet' }}
     </h1>
 
-    <form action="{{ $project ? route('projects.update', $project) : route('projects.store') }}" method="POST">
+    <form action="{{ isset($project) ? route('projects.update', $project) : route('projects.store') }}" method="POST">
         @csrf
-        @if($project)
-            @method('PUT') <!-- Utilisé pour les mises à jour -->
+        @if(isset($project))
+            @method('PUT')
         @endif
 
-        <!-- Nom du projet -->
-        <div class="mb-4">
-            <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Nom du projet</label>
-            <input type="text" name="name" id="name"
-                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                   value="{{ old('name', $project->name ?? '') }}" required>
-            @error('name')
-                <p class="text-red-500 text-xs italic">{{ $message }}</p>
-            @enderror
-        </div>
+        <!-- Carte Informations générales et Actions -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Informations générales</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Nom du projet -->
+                <div>
+                    <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Nom du projet</label>
+                    <input type="text" name="name" id="name"
+                           class="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:ring focus:ring-blue-200 focus:border-blue-500 bg-gray-50"
+                           value="{{ old('name', $project->name ?? '') }}" required>
+                    @error('name')
+                        <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                    @enderror
+                </div>
 
-        <!-- Description -->
-        <div class="mb-4">
-            <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Description</label>
-            <textarea name="description" id="description" rows="4"
-                      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ old('description', $project->description ?? '') }}</textarea>
-            @error('description')
-                <p class="text-red-500 text-xs italic">{{ $message }}</p>
-            @enderror
-        </div>
+                <!-- Description -->
+                <div>
+                    <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Description</label>
+                    <textarea name="description" id="description" rows="4"
+                              class="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:ring focus:ring-blue-200 focus:border-blue-500 bg-gray-50">{{ old('description', $project->description ?? '') }}</textarea>
+                    @error('description')
+                        <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
 
-        <!-- Bouton de soumission -->
-        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-6">
-            {{ $project ? 'Mettre à jour' : 'Créer' }}
-        </button>
+            <!-- Actions en bas à droite -->
+            <div class="flex justify-end mt-6">
+                @if($project)
+                <!-- Bouton Mettre à jour -->
+                <button type="submit" class="bg-blue-500 hover:bg-blue-500 hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 ml-2">
+                    Mettre à jour
+                </button>
+
+                    <!-- Bouton Supprimer -->
+                    <form action="{{ route('projects.destroy', $project) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="bg-red-500 hover:bg-red-500 hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 ml-2">
+                            Supprimer
+                        </button>
+                    </form>
+
+                    <!-- Bouton Valider/Invalider -->
+                    <form action="{{ route('projects.changeStatus', $project) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="bg-green-500 hover:bg-green-500 hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 ml-2">
+                            {{ $project->is_completed ? 'Invalider' : 'Valider' }}
+                        </button>
+                    </form>
+                @else
+                    <!-- Bouton Créer -->
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-500 hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 ml-2">
+                        Créer
+                    </button>
+                @endif
+            </div>
+        </div>
     </form>
 
     <!-- Gestion des collaborateurs (uniquement si un projet existe) -->
     @if($project && auth()->id() == $project->user_id)
-        <div class="mt-8 bg-gray-100 p-6 rounded-lg">
-            <h2 class="text-xl font-bold mb-4">Gestion des collaborateurs</h2>
-
-            <!-- Formulaire d'ajout de collaborateur -->
-            <form action="{{ route('projects.users.add', $project) }}" method="POST" class="mb-6 flex items-center space-x-4">
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Gestion des collaborateurs</h2>
+            <form action="{{ route('projects.users.add', $project) }}" method="POST" class="mb-4">
                 @csrf
-                <input type="text" name="username" placeholder="Nom d'utilisateur"
-                       class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline flex-grow">
-                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                    Ajouter Collaborateur
-                </button>
+                <div class="flex items-center">
+                    <input type="text" name="username" id="username" placeholder="Nom d'utilisateur"
+                           class="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:ring focus:ring-blue-200 focus:border-blue-500 bg-gray-50"
+                           required>
+                    <button type="submit" class="ml-2 bg-green-500 hover:bg-green-500 hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200">
+                        Ajouter
+                    </button>
+                </div>
             </form>
-            @error('username')
-                @php $message = $message ?? ''; @endphp
-                <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
-            @enderror
 
-            <!-- Liste des collaborateurs -->
-            <h3 class="font-semibold mb-2">Collaborateurs actuels</h3>
+            <h3>Collaborateurs actuels</h3>
             @if($project->users && $project->users->count() > 0)
-                <div class="bg-white rounded-lg overflow-hidden">
+                <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
@@ -78,7 +107,7 @@
                                         <form action="{{ route('projects.users.remove', [$project, $user]) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">
+                                            <button type="submit" class="bg-red-500 hover:bg-red-500 hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200">
                                                 Supprimer
                                             </button>
                                         </form>
@@ -89,7 +118,7 @@
                     </table>
                 </div>
             @else
-                <p class="text-gray-500 italic">Aucun collaborateur pour le moment.</p>
+                <p>Aucun collaborateur pour le moment.</p>
             @endif
         </div>
     @endif

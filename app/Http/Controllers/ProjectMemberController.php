@@ -7,12 +7,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+// Permet de gérer les collaborateurs d'un projet
 class ProjectMemberController extends Controller
 {
-    // Ajouter un utilisateur au projet
+    // Ajoute un utilisateur au projet
     public function addUser(Request $request, Project $project)
     {
-        // Vérifier que l'utilisateur actuel est le créateur du projet
+        // Vérifie que l'utilisateur actuel est le créateur du projet
         if (!$project->isCreator(Auth::user())) {
             return redirect()->back()->with('error', 'Seul le créateur du projet peut ajouter des utilisateurs.');
         }
