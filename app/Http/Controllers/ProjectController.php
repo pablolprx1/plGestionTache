@@ -66,7 +66,11 @@ class ProjectController extends Controller
 
     public function edit(Project $project)
     {
-        return view('projects.form', compact('project')); // Passe le projet existant à la vue
+        if (!$project->isCreator(Auth::user())) {
+            abort(403, 'Vous n\'êtes pas autorisé à modifier ce projet.');
+        }
+
+        return view('projects.form', compact('project'));
     }
 
     public function update(Request $request, Project $project)
@@ -83,6 +87,10 @@ class ProjectController extends Controller
 
     public function destroy(Project $project)
     {
+        if (!$project->isCreator(Auth::user())) {
+            abort(403, 'Vous n\'êtes pas autorisé à supprimer ce projet.');
+        }
+
         $project->delete();
 
         return redirect()->route('projects.index')->with('success', 'Projet supprimé avec succès.');

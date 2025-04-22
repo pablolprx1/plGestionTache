@@ -11,12 +11,10 @@ class UsersTableSeeder extends Seeder
     public function run()
     {
         User::create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => Hash::make('password'),
-            'username' => 'testuser', // Ajoutez cette ligne si vous utilisez un champ username
+            'name' => 'Pablo Leparoux',
+            'email' => 'plprx@example.com',
+            'username' => 'pablolprx', // Si vous utilisez un champ "username"
+            'password' => Hash::make('password'), // Mot de passe par défaut
         ]);
-
-        // Vous pouvez ajouter d'autres utilisateurs ici
     }
 }

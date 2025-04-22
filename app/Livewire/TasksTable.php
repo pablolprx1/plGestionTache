@@ -14,19 +14,17 @@ class TasksTable extends Component
     public $editingTaskTitle;
     public $editingTaskDescription;
     public $newTaskName = [];
+    public $newPhaseName;
 
-    protected $listeners = ['openEditTaskModal', 'updateTaskData'];
+    protected $listeners = ['openEditTaskModal', 'updateTaskData', 'refreshTasksTable'];
 
     public function render()
     {
-        $phases = Phase::where('project_id', $this->projectId)
-            ->with(['tasks' => function ($query) {
-                $query->orderBy('deadline', 'asc'); // Trier par date d'échéance
-            }])
-            ->orderBy('order', 'asc')
-            ->get();
+        $phases = Phase::with('tasks')->where('project_id', $this->projectId)->get();
 
-        return view('livewire.tasks-table', compact('phases'));
+        return view('livewire.tasks-table', [
+            'phases' => $phases,
+        ]);
     }
 
 
@@ -41,6 +39,7 @@ class TasksTable extends Component
     {
         Task::find($taskId)->delete();
     }
+
 
     public function openEditTaskModal($taskId)
     {
@@ -75,7 +74,6 @@ class TasksTable extends Component
         }
     }
 
-
     public function addTask($phaseId)
     {
         $validatedData = $this->validate([
@@ -102,4 +100,40 @@ class TasksTable extends Component
 
         $this->render();
     }
+
+    public function addPhase()
+    {
+        $this->validate([
+            'newPhaseName' => 'required|max:255',
+        ]);
+
+        Phase::create([
+            'name' => $this->newPhaseName,
+            'project_id' => $this->projectId,
+            'order' => Phase::where('project_id', $this->projectId)->max('order') + 1,
+        ]);
+
+        $this->newPhaseName = ''; // Réinitialiser le champ
+
+        $this->emit('refreshTasksTable');
+    }
+
+    public function deletePhase($phaseId)
+    {
+        $phase = Phase::find($phaseId);
+
+        if ($phase) {
+            $phase->tasks()->delete(); // Supprimer les tâches associées
+            $phase->delete(); // Supprimer la phase
+        }
+
+        $this->emit('refreshTasksTable');
+    }
+
+    public function refreshTasksTable()
+    {
+        // Cette méthode sera appelée pour rafraîchir le composant
+        $this->render();
+    }
+
 }

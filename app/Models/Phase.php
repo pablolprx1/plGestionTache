@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Phase extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'project_id',
+        'id',
+        'name',
+    ];
 
     // Relation avec le projet
     public function project()

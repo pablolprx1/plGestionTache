@@ -18,7 +18,7 @@ class Task extends Model
     ];
 
     protected $casts = [
-        'deadline' => 'datetime', // Ensure deadline is cast to a Carbon instance
+        'deadline' => 'datetime',
     ];
 
     // Relation avec la phase

@@ -1,4 +1,10 @@
 <div>
+    <!-- Nouveau bouton pour gérer les phases -->
+    <div class="mb-4">
+        <livewire:manage-phases :project-id="$projectId" />
+    </div>
+
+    <!-- Tableau des phases et tâches -->
     <div class="overflow-x-auto max-h-[500px]">
         <table class="min-w-full bg-white border border-gray-300">
             <thead>
@@ -6,15 +12,17 @@
                     <th class="px-4 py-2 border w-24">Phase</th>
                     <th class="px-4 py-2 border">Tâche</th>
                     <th class="px-4 py-2 border w-16 text-center">État</th>
+                    <th class="px-4 py-2 border w-32 text-center">Échéance</th>
                     <th class="px-4 py-2 border w-32 text-center">Actions</th>
-                    <th class="px-4 py-2 border w-32 text-center">Date d'échéance</th> <!-- Colonne Date d'échéance -->
                 </tr>
             </thead>
             <tbody wire:sortable="updateTaskOrder">
                 @foreach($phases as $phase)
                     <tr wire:sortable.item="{{ $phase->id }}">
                         <td class="px-4 py-2 border" rowspan="{{ $phase->tasks->count() + 1 }}">
-                            {{ $phase->name }}
+                            <div class="flex justify-between items-center">
+                                <span>{{ $phase->name }}</span>
+                            </div>
                         </td>
                     </tr>
                     @foreach($phase->tasks as $task)
@@ -26,21 +34,33 @@
                                 </div>
                             </td>
                             <td class="px-4 py-2 border text-center">
-                                <div class="flex justify-center">
-                                    <button wire:click="openEditTaskModal({{ $task->id }})" class="bg-yellow-400 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded mr-2">Modifier</button>
-                                    <button wire:click="deleteTask({{ $task->id }})" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded">Supprimer</button>
-                                </div>
+                                {{ $task->deadline ? $task->deadline->format('d/m/Y') : 'Non définie' }}
                             </td>
                             <td class="px-4 py-2 border text-center">
-                                {{ $task->deadline ? $task->deadline->format('d/m/Y') : 'Non définie' }} <!-- Affichage de la date d'échéance -->
+                                <div class="flex justify-center space-x-2">
+                                    <button wire:click="openEditTaskModal({{ $task->id }})"
+                                            class="bg-yellow-400 hover:bg-yellow-600 text-white rounded-full p-2"
+                                            title="Modifier">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                    </button>
+                                    <button wire:click="deleteTask({{ $task->id }})"
+                                            class="bg-red-500 hover:bg-red-700 text-white rounded-full p-2"
+                                            title="Supprimer">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
                     <tr>
-                        <td colspan="4" class="px-4 py-2 border">
+                        <td colspan="5" class="px-4 py-2 border">
                             <form wire:submit.prevent="addTask({{ $phase->id }})">
                                 <input type="text" wire:model="newTaskName.{{ $phase->id }}" placeholder="Nom de la nouvelle tâche" class="border rounded px-2 py-1">
-                                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded">Ajouter Tâche</button>
+                                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded">Ajouter</button>
                             </form>
                         </td>
                     </tr>
@@ -60,7 +80,11 @@
         const description = taskData?.description || ''; // Récupérer la description
         console.log("Description de la tâche :", description);
         const deadline = taskData?.deadline || ''; // Récupérer la date d'échéance
-        console.log("Date d'échéance de la tâche :", deadline)
+        console.log("Date d'échéance de la tâche :", deadline);
+
+        // Convertir la date au format jj/mm/aaaa sans décalage
+        const formattedDeadline = deadline ? deadline.split('T')[0] : '';
+        console.log("Date d'échéance formatée :", formattedDeadline);
 
         Swal.fire({
             title: 'Modifier la tâche',
@@ -77,7 +101,7 @@
                     </div>
                     <div style="margin-bottom: 15px;">
                         <label for="swal-input3">Date d'échéance</label>
-                        <input id="swal-input3" type="date" class="swal2-input" value="${deadline}">
+                        <input id="swal-input3" type="date" class="swal2-input" value="${formattedDeadline}">
                     </div>
                 </div>
             `,
@@ -89,7 +113,7 @@
                 const newDescription = document.getElementById('swal-input2').value;
                 const newDeadline = document.getElementById('swal-input3').value;
 
-                @this.call('updateTaskData', newTitle, newDescription, newDeadline); // Use @this.call
+                @this.call('updateTaskData', newTitle, newDescription, newDeadline);
             }
         });
     });
@@ -137,7 +161,3 @@
         Swal.close();
     });
 </script>
-
-
-
-

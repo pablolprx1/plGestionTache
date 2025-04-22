@@ -11,12 +11,6 @@ class Project extends Model
     use HasFactory;
     protected $fillable = ['name', 'description', 'is_completed', 'user_id'];
 
-    // Relation avec l'utilisateur
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
     // Relation avec les phases
     public function phases()
     {
@@ -31,5 +25,21 @@ class Project extends Model
     public function scopeIncomplete($query)
     {
         return $query->where('is_completed', false);
+    }
+    // Relation Many-to-Many avec User
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'project_user');
+    }
+
+    // Relation avec le créateur du projet (One-to-Many)
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+    // Vérifie si un utilisateur est le créateur du projet
+    public function isCreator($user)
+    {
+        return $this->user_id === $user->id;
     }
 }

@@ -14,7 +14,14 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     // Relations avec le modèle Projet
-    public function projects(): HasMany
+    // Relation Many-to-Many avec Project
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class, 'project_user');
+    }
+
+    // Relation avec les projets créés par l'utilisateur (One-to-Many)
+    public function createdProjects()
     {
         return $this->hasMany(Project::class);
     }
