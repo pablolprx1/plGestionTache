@@ -1,12 +1,10 @@
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
 # Gestion de Projet
 
 Cette application est un gestionnaire de tâches développé avec Laravel. Elle permet de gérer des projets et leurs tâches associées via une interface utilisateur intuitive.
 
 ## Fonctionnalités
 
-- Gestion des utilisateurs (inscription, connexion, réinitialisation de mot de passe)
+- Gestion des utilisateurs (inscription, connexion)
 - Création, modification et suppression de projets
 - Gestion des tâches associées à chaque projet
 
