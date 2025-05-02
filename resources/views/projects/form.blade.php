@@ -40,13 +40,17 @@
             <!-- Actions en bas à droite -->
             <div class="flex justify-end mt-6">
                 @if($project)
-                <!-- Bouton Mettre à jour -->
-                <button type="submit" class="bg-blue-500 hover:bg-blue-500 hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 ml-2">
-                    Mettre à jour
-                </button>
+                    <!-- Formulaire pour Mettre à jour -->
+                    <form action="{{ route('projects.update', $project) }}" method="POST" class="inline">
+                        @csrf
+                        @method('PUT')
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-500 hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 ml-2">
+                            Mettre à jour
+                        </button>
+                    </form>
 
-                    <!-- Bouton Supprimer -->
-                    <form action="{{ route('projects.destroy', $project) }}" method="POST">
+                    <!-- Formulaire pour Supprimer -->
+                    <form action="{{ route('projects.destroy', $project) }}" method="POST" class="inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="bg-red-500 hover:bg-red-500 hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 ml-2">
@@ -54,18 +58,21 @@
                         </button>
                     </form>
 
-                    <!-- Bouton Valider/Invalider -->
-                    <form action="{{ route('projects.changeStatus', $project) }}" method="POST">
+                    <!-- Formulaire pour Valider/Invalider -->
+                    <form action="{{ route('projects.changeStatus', $project) }}" method="POST" class="inline">
                         @csrf
                         <button type="submit" class="bg-green-500 hover:bg-green-500 hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 ml-2">
                             {{ $project->is_completed ? 'Invalider' : 'Valider' }}
                         </button>
                     </form>
                 @else
-                    <!-- Bouton Créer -->
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-500 hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 ml-2">
-                        Créer
-                    </button>
+                    <!-- Formulaire pour Créer -->
+                    <form action="{{ route('projects.store') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-500 hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 ml-2">
+                            Créer
+                        </button>
+                    </form>
                 @endif
             </div>
         </div>

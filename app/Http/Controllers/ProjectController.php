@@ -6,8 +6,8 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Routing\Controller;
-
 class ProjectController extends Controller
 {
     public function __construct()
@@ -108,15 +108,6 @@ class ProjectController extends Controller
     public function changeStatus(Request $request, Project $project)
     {
         $this->authorizeProjectAccess($project);
-
-        // Valider les données du formulaire
-        $validatedData = $request->validate([
-            'name' => 'required|max:255',
-            'description' => 'nullable',
-        ]);
-
-        // Mettre à jour les champs du projet
-        $project->update($validatedData);
 
         // Changer le statut du projet
         $project->update([
