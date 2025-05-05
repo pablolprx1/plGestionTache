@@ -24,14 +24,14 @@ class TasksTable extends Component
     {
         $tasksQuery = Task::where('project_id', $this->projectId);
 
-        // Filtrer par utilisateur assigné
+        // Filtre les tâches par l'utilisateur sélectionné dans la combo
         if ($this->filterUserId) {
             $tasksQuery->where('assigned_user_id', $this->filterUserId);
         }
         $tasks = $tasksQuery->orderBy('deadline')->get();
         $project = \App\Models\Project::find($this->projectId);
 
-        // Récupération des utilisateurs liés au projet
+        // Récupère les utilisateurs du projet
         if ($project) {
             $mainUser = DB::table('users')
                 ->where('id', $project->user_id)
@@ -146,13 +146,13 @@ class TasksTable extends Component
             'is_completed' => false,
         ]);
 
-        $this->newTaskName = ''; // Réinitialiser le champ après l'ajout
+        $this->newTaskName = ''; // Réinitialise le champ après l'ajout
         $this->dispatch('refreshTasksTable');
         }
 
     public function refreshTasksTable()
     {
-        // Cette méthode sera appelée pour rafraîchir le composant
+        // Permet de rafraîchir le tableau
         $this->render();
     }
 
