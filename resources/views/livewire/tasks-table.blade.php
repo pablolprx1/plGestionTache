@@ -146,6 +146,7 @@ window.addEventListener('open-edit-task-modal', event => {
             const newDeadline = document.getElementById('swal-input3').value;
             const newAssignedUserId = document.getElementById('swal-input4').value;
 
+            // Appel de la méthode Livewire pour mettre à jour la tâche
             @this.call('updateTaskData', newTitle, newDescription, newDeadline, newAssignedUserId);
         }
     });
