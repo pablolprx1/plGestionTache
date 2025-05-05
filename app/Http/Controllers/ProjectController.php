@@ -15,18 +15,19 @@ class ProjectController extends Controller
         $this->middleware('auth');
     }
 
+    // Affiche la liste des projets
     public function index(Request $request)
     {
         $status = $request->input('status');
         $user = Auth::user();
 
-        // Filtrer les projets où l'utilisateur est créateur ou collaborateur
+        // Récupérer les projets de l'utilisateur connecté (ceux ou il est créateur ou collaborateur)
         $projects = Project::where('user_id', $user->id)
             ->orWhereHas('users', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             });
 
-        // Appliquer les filtres de statut
+        // Filtre les projets en fonction du statut (terminé/non terminé)
         if ($status === 'completed') {
             $projects->completed();
         } elseif ($status === 'incomplete') {
@@ -43,6 +44,7 @@ class ProjectController extends Controller
         return view('projects.form', ['project' => null]);
     }
 
+    // Création du projet
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -56,7 +58,6 @@ class ProjectController extends Controller
             $project = Project::create($validatedData);
             return redirect()->route('projects.index')->with('success', 'Projet créé avec succès.');
         } catch (QueryException $e) {
-            // Ajoutez l'ID au message d'erreur
             $errorMessage = "Erreur lors de la création du projet avec l'utilisateur ID : " . Auth::id() . ". Détails : " . $e->getMessage();
             return back()->withErrors(['message' => $errorMessage]);
         }
@@ -71,6 +72,7 @@ class ProjectController extends Controller
         return view('projects.form', compact('project'));
     }
 
+    // Met à jour le projet
     public function update(Request $request, Project $project)
     {
         $validatedData = $request->validate([
@@ -105,11 +107,12 @@ class ProjectController extends Controller
         return view('projects.show', compact('project', 'tasks'));
     }
 
+    // Change le statut du projet (terminé/non terminé)
     public function changeStatus(Request $request, Project $project)
     {
         $this->authorizeProjectAccess($project);
 
-        // Changer le statut du projet
+        // Change le statut du projet
         $project->update([
             'is_completed' => !$project->is_completed,
         ]);
@@ -119,6 +122,7 @@ class ProjectController extends Controller
         return redirect()->route('projects.edit', $project)->with('success', $statusMessage . ' Les modifications ont été enregistrées.');
     }
 
+    // Vérifie si l'utilisateur a accès au projet
     protected function authorizeProjectAccess(Project $project)
     {
         $user = Auth::user();
