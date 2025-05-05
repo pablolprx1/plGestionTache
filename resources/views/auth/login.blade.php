@@ -1,12 +1,12 @@
 <x-guest-layout>
     <!-- Carte de connexion -->
     <div class="text-center mb-6">
-        <h1 class="text-3xl font-bold text">plGestionTâche</h1>
+        <h1 class="text-3xl font-bold text-center">plGestionTâche</h1>
     </div>
 
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('login') }}">
+    <form method="POST" action="{{ route('login') }}" class="text-center">
         @csrf
 
         <!-- Identifiant -->
@@ -23,24 +23,24 @@
         </div>
 
         <!-- Se souvenir de moi -->
-        <div class="block mt-4">
+        <div class="block mt-4 text-left">
             <label for="remember_me" class="inline-flex items-center">
                 <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
                 <span class="ms-2 text-sm text-gray-600">{{ __('Se souvenir de moi') }}</span>
             </label>
         </div>
 
-        <!-- Boutons -->
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button class="ms-3">
-                {{ __('Connexion') }}
+        <!-- Bouton de connexion -->
+        <div class="mt-4">
+            <x-primary-button class="w-full flex justify-center items-center">
+                {{ __('Se connecter') }}
             </x-primary-button>
         </div>
     </form>
 
     <!-- Lien vers l'inscription -->
-    <div class="mt-4 text-center">
-        <p class="text-sm text-gray-600">
+    <div class="mt-4 flex justify-center">
+        <p class="text-sm text-gray-600 text-center">
             {{ __("Vous n'avez pas de compte ?") }}
             <a href="{{ route('register') }}" class="text-indigo-600 hover:text-indigo-900 underline">
                 {{ __('Inscrivez-vous ici') }}
