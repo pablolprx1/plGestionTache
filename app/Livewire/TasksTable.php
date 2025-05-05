@@ -124,10 +124,11 @@ class TasksTable extends Component
             $task->title = $title;
             $task->description = $description;
             $task->deadline = $deadline ? \Carbon\Carbon::parse($deadline) : null;
-            $task->assigned_user_id = $assignedUserId ? $assignedUserId : null; // Assigner l'utilisateur ou le laisser vide
+            $task->assigned_user_id = $assignedUserId ? $assignedUserId : null; // Assigne l'utilisateur ou le laisse à null
             $task->save();
 
             $this->dispatch('close-edit-task-modal');
+            session()->flash('success', 'Projet mis à jour avec succès.');
             $this->reset('editingTaskId', 'editingTaskTitle', 'editingTaskDescription', 'editingTaskDeadline', 'editingTaskAssignedUserId');
         } else {
             session()->flash('error', 'Tâche non trouvée.');

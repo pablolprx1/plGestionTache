@@ -63,6 +63,7 @@ class ProjectController extends Controller
         }
     }
 
+    // Renvoie la vue de modification du projet en vérifiant que l'utilisateur est le créateur
     public function edit(Project $project)
     {
         if (!$project->isCreator(Auth::user())) {
