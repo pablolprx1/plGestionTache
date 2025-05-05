@@ -89,27 +89,21 @@
 
 <script>
 window.addEventListener('open-edit-task-modal', event => {
-    console.log("Données reçues dans l'event :", event.detail);
 
-    const taskData = event.detail[0]; // Accéder directement à l'objet
+    const taskData = event.detail[0]; 
     const title = taskData?.title || ''; // Récupérer le titre
-    console.log("Titre de la tâche :", title);
     const description = taskData?.description || ''; // Récupérer la description
-    console.log("Description de la tâche :", description);
     const deadline = taskData?.deadline || ''; // Récupérer la date d'échéance
-    console.log("Date d'échéance de la tâche :", deadline);
     const assignedUserId = taskData?.assignedUserId || ''; // Récupérer l'utilisateur assigné
-    console.log("Utilisateur assigné :", assignedUserId);
     const projectUsers = taskData?.projectUsers || []; // Récupérer les utilisateurs du projet
-    console.log("Utilisateurs du projet :", projectUsers);
 
-    // Convertir la date au format jj/mm/aaaa sans décalage
+    // On convertit la date d'échéance au format 'YYYY-MM-DD' pour le champ input de type date
     const formattedDeadline = deadline ? deadline.split('T')[0] : '';
-    console.log("Date d'échéance formatée :", formattedDeadline);
 
+    // Popup de modification de tâche avec la library SweetAlert
     Swal.fire({
         title: 'Modifier la tâche',
-        width: '600px', // Réduire la largeur
+        width: '600px',
         html: `
             <div class="flex flex-col space-y-4">
                 <div>
@@ -157,7 +151,7 @@ window.addEventListener('open-edit-task-modal', event => {
     });
 });
 
-
+    // Style de la Popup
     const style = document.createElement('style');
     style.innerHTML = `
         .swal2-cancel-red {
@@ -168,31 +162,31 @@ window.addEventListener('open-edit-task-modal', event => {
             background-color: #cc1f1a !important; /* Rouge foncé */
         }
         .swal2-actions-left {
-            justify-content: flex-start !important; /* Aligner les boutons à gauche */
-            margin-top: 20px; /* Espacement entre les champs et les boutons */
+            justify-content: flex-start !important;
+            margin-top: 20px;
         }
         .swal2-popup {
-            text-align: center !important; /* Centrer le contenu de la popup */
+            text-align: center !important;
         }
         .swal2-html-container {
-            text-align: left !important; /* Aligner le contenu HTML à gauche */
+            text-align: left !important;
         }
         .swal2-input, .swal2-textarea {
-            margin: 0 auto; /* Centrer les champs horizontalement */
-            width: 100%; /* S'assurer que les champs occupent toute la largeur disponible */
-            box-sizing: border-box; /* Inclure les bordures et le padding dans la largeur */
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
         }
         .swal2-input {
-            margin-bottom: 15px; /* Espacement entre les champs */
+            margin-bottom: 15px;
         }
         .swal2-textarea {
-            height: 150px; /* Hauteur fixe pour le champ Description */
-            margin-bottom: 15px; /* Espacement entre les champs */
+            height: 150px;
+            margin-bottom: 15px;
         }
         .swal2-label {
             font-weight: bold;
             margin-bottom: 5px;
-            display: block; /* Forcer les labels à être sur une ligne séparée */
+            display: block;
         }
     `;
     document.head.appendChild(style);
